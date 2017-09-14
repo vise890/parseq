@@ -1,18 +1,21 @@
 (ns parseq.combinators
-  (:refer-clojure :exclude [or merge peek])
+  (:refer-clojure :exclude [or merge peek + *])
   (:require [clojure.core.match :refer [match]]
             [parseq.utils :as pu]))
 
 (defn return
   "A parser that does nothing and always succeeds.
-   It returns the input unchanged and the supplied `v` as a result"
+   It returns the input unchanged and the supplied `v` as a result."
   [v]
   (fn [input] [v input]))
 
 (defn bind
   "This is just a monadic bind. A.k.a. >>=
 
-   bind :: [Parser a, (a -> Parser b)] -> Parser b"
+   bind :: [Parser a, (a -> Parser b)] -> Parser b
+
+  Kind of 'Apply parser `p` and then apply the parser `p2`
+  you get by applying `f` to the result of `p`'"
   [p f]
   (fn [input]
     (match (pu/parse p input)
@@ -35,18 +38,25 @@
            failures             []
            res                  nil]
       (if (empty? parsers)
-        (if (pu/failure? res)
-          (pu/->failure "or-c had no more parsers"
-                        {:parsers-failures failures})
-          res)
+        (pu/->failure "or-c had no more parsers"
+                      {:parsers-failures failures})
         (match (pu/parse p input)
                [r rsin] [r rsin]
                (f :guard pu/failure?) (recur ps (conj failures f) res))))))
 
-(defn many
-  "Parse `p` 0 or more times"
-  ;; NOTE you could make this as a combo of `and-c` + `optional-c`, but may be
-  ;;      worth leaving for perf?
+(defn ?
+  "Optionally parses one `p`, returning a seq containing it if found.
+  If `p` doesn't match, returns an empty seq"
+  [p]
+  (fn [input]
+    (match (pu/parse p input)
+           [r rsin] [[r] rsin]
+           (f :guard pu/failure?) [[] input])))
+
+(defn *
+  "Parse `p` 0 or more times. Similar to `*` in regular expressions."
+  ;; NOTE cleverer impl to feel good about myself?
+  ;;      worth leaving for perf? FIXME:
   [p]
   (fn [input]
     (loop [results    []
@@ -55,9 +65,21 @@
              [r rsin] (recur (conj results r) rsin)
              (_ :guard pu/failure?) [results rest-input]))))
 
+(defn vanity*
+  "Alternative, way cooler implementation of *"
+  [p]
+  (bind (? p)
+        (fn [r] (fmap (partial concat r) (* p)))))
+
+(defn +
+  [p]
+  (bind p
+        (fn [r]
+          (fmap #(conj % r)
+                (* p)))))
+
 (defn merge
-  "Applies `parsers` in order and then merges
-  their results into one big fat map."
+  "Applies `parsers` in order and then merges their results into one big fat map."
   [parsers]
   (fn [input]
     (loop [[p & ps :as pps] parsers
@@ -78,3 +100,15 @@
     (match (pu/parse p input)
            [r _rsin] [r input]
            (r :guard pu/failure?) r)))
+
+(defn skip*
+  "Skips 0 or more p."
+  [p]
+  (fmap (fn [_] nil) (* p)))
+
+(defn skip+
+  "Skips 1 or more p."
+  [p]
+  (fmap (fn [_] nil) (+ p)))
+
+

@@ -1,5 +1,4 @@
-(ns parseq.utils
-  (:require [clojure.core.match :refer [match]]))
+(ns parseq.utils)
 
 (defn parse
   "A helper function to invoke parser p on input"

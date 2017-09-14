@@ -18,20 +18,30 @@
   (match input
          [x] [x nil]
          [x & y] [x y]
-         _ (pu/->failure "one-p fail")))
+         _ (pu/->failure "one-p fail"
+                         {:input input})))
 
-(defn ->one=
-  "Builds a parser that takes an element that equals `v`"
-  [v]
-  (fn [input]
-    (match input
-           [v & rsin] [v rsin]
-           _ (pu/->failure "one=-p fail"))))
-
-(defn one-satisfying
+(defn ->one-satisfying
   "Builds a parser that takes an element that satisfies `predicate`"
   [predicate]
   (fn [input]
     (match input
            [(v :guard predicate) & rsin] [v rsin]
-           _ (pu/->failure "one-satisfying fail"))))
+           _ (pu/->failure "one-satisfying fail"
+                           {:input     input
+                            :predicate predicate}))))
+
+(defn ->one-not-satisfying
+  "Builds a parser that takes an element that does not satisfy `predicate`"
+  [predicate]
+  (->one-satisfying (complement predicate)))
+
+(defn ->one=
+  "Builds a parser that takes an element that equals `v`"
+  [v]
+  (->one-satisfying (partial = v)))
+
+(defn ->one-not=
+  "Builds a parser that takes an element that equals `v`"
+  [v]
+  (->one-not-satisfying (partial = v)))
