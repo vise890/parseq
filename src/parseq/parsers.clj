@@ -22,7 +22,7 @@
          _ (pu/->failure "one-p fail"
                          {:input input})))
 
-(defn ->one-satisfying
+(defn one-satisfying
   "Builds a parser that takes an element that satisfies `predicate`"
   [predicate]
   (fn [input]
@@ -32,17 +32,17 @@
                            {:input     input
                             :predicate predicate}))))
 
-(defn ->one-not-satisfying
+(defn one-not-satisfying
   "Builds a parser that takes an element that does not satisfy `predicate`"
   [predicate]
-  (->one-satisfying (complement predicate)))
+  (one-satisfying (complement predicate)))
 
-(defn ->one=
+(defn one=
   "Builds a parser that takes an element that equals `v`"
   [v]
-  (->one-satisfying (partial = v)))
+  (one-satisfying (partial = v)))
 
-(defn ->one-not=
+(defn one-not=
   "Builds a parser that takes an element that equals `v`"
   [v]
-  (->one-not-satisfying (partial = v)))
+  (one-not-satisfying (partial = v)))

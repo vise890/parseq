@@ -18,14 +18,14 @@
 (deftest fmap
   (is (= [{:one 1} [:fin]]
          (pu/parse (sut/fmap (fn [one] {:one one})
-                             (p/->one= 1))
+                             (p/one= 1))
                    [1 :fin]))))
 
 (deftest or-c
 
   (is (= [[1 1 2] [:a :a]]
-         (pu/parse (sut/* (sut/or (p/->one= 1)
-                                  (p/->one= 2)))
+         (pu/parse (sut/* (sut/or (p/one= 1)
+                                  (p/one= 2)))
                    [1 1 2 :a :a])))
 
   (is (= [:hi nil]
@@ -55,7 +55,7 @@
                    [:a :b :c])))
 
   (is (= [[] [:a :b :c]]
-         (pu/parse (sut/? (p/->one= :boop))
+         (pu/parse (sut/? (p/one= :boop))
                    [:a :b :c]))))
 
 (deftest *-c
@@ -64,7 +64,7 @@
 
   (testing "stops parsing correctly"
     (is (= [[1 1 1] [:a :a :a]]
-           (pu/parse (sut/* (p/->one= 1)) [1 1 1 :a :a :a]))))
+           (pu/parse (sut/* (p/one= 1)) [1 1 1 :a :a :a]))))
 
   (testing "returns [] when input is nil"
     (is (= [[] []]
@@ -78,7 +78,7 @@
 
   (testing "stops parsing correctly"
     (is (= [[1 1 1] [:a :a :a]]
-           (pu/parse (sut/vanity* (p/->one= 1)) [1 1 1 :a :a :a]))))
+           (pu/parse (sut/vanity* (p/one= 1)) [1 1 1 :a :a :a]))))
 
   (testing "returns [] when input is nil"
     (is (= [[] []]
@@ -88,17 +88,17 @@
 
 (deftest +-c
   (is (= [[:a :a] [:b :c]]
-         (pu/parse (sut/+ (p/->one= :a))
+         (pu/parse (sut/+ (p/one= :a))
                    [:a :a :b :c])))
 
-  (is (pu/failure? (pu/parse (sut/+ (p/->one= :a))
+  (is (pu/failure? (pu/parse (sut/+ (p/one= :a))
                              [:f :o :o])))
 
   (testing "maintains order"
     (is (= [[1 2 3] [:a]]
-           (pu/parse (sut/* (sut/or (p/->one= 2)
-                                    (p/->one= 1)
-                                    (p/->one= 3)))
+           (pu/parse (sut/* (sut/or (p/one= 2)
+                                    (p/one= 1)
+                                    (p/one= 3)))
                      [1 2 3 :a]))))
 
   (testing "returns [] when input is nil"
@@ -109,11 +109,11 @@
 
 (deftest merge-c
   (let [p   (sut/merge [(sut/fmap (fn [one] {:one one})
-                                  (p/->one= 1))
+                                  (p/one= 1))
                         (sut/fmap (fn [two] {:two two})
-                                  (p/->one= 2))
+                                  (p/one= 2))
                         (sut/fmap (fn [three] {:three three})
-                                  (p/->one= 3))])
+                                  (p/one= 3))])
         act (pu/parse p [1 2 3 :nope])]
     (is (= [{:one   1
              :two   2
@@ -144,16 +144,16 @@
 
 (deftest skip*-c
   (is (= [nil [:b]]
-         (pu/parse (sut/skip* (p/->one= :a)) [:a :a :b])))
+         (pu/parse (sut/skip* (p/one= :a)) [:a :a :b])))
 
   (testing "parses 0 repetitions"
     (is (= [nil [:a :b]]
-           (pu/parse (sut/skip* (p/->one= :b)) [:a :b])))))
+           (pu/parse (sut/skip* (p/one= :b)) [:a :b])))))
 
 (deftest skip+-c
   (is (= [nil [:b]]
-         (pu/parse (sut/skip+ (p/->one= :a)) [:a :a :b])))
+         (pu/parse (sut/skip+ (p/one= :a)) [:a :a :b])))
 
   (testing "fails when parser doesn't match first repetition"
-    (is (pu/failure? (pu/parse (sut/skip+ (p/->one= :b))
+    (is (pu/failure? (pu/parse (sut/skip+ (p/one= :b))
                                [:a :b])))))

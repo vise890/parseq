@@ -58,17 +58,22 @@ Combinator :: Parser a -> Parser b
             [parseq.parsers :as p]
             [parseq.utils :as pu]))
 
-(pu/parse p/one-p [1 2])
+(pu/parse p/one [1 2])
 ;; => [1 [2]]
 
-(pu/parse p/one-p [[1 2]])
+(pu/parse p/one [[1 2]])
 ;; => [[1 2] nil]
 
-(pu/parse (c/peek-c p/one-p) [1 [2 3]])
+(pu/parse (c/peek p/one) [1 [2 3]])
 ;; => [1 [1 [2 3]]]
 
-(pu/parse (c/many-c (p/->one=-p 1)) [1 1 1 :a :a :a])
+(pu/parse (c/* (p/one= 1)) [1 1 1 :a :a :a])
 ;; => [[1 1 1] [:a :a :a]]
+
+(pu/parse (c/* (c/or (p/one= 1)
+                     (p/one= 2)))
+          [1 1 1 2 2 2 :a :a :a])
+;; => [[1 1 1 2 2 2] [:a :a :a]]
 
 ;; there's a bit more, but you'll have to look at the source for now
 
