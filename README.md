@@ -77,10 +77,10 @@ Combinator :: Parser a -> Parser b
 
 ## Cool Links about Parser Combinators
 
-* [**good, 2-minute intro is**](http://theorangeduck.com/page/you-could-have-invented-parser-combinators)
+* [**good, 2-minute intro**](http://theorangeduck.com/page/you-could-have-invented-parser-combinators)
 * [A bit more in depth / rigorous](http://sigusr2.net/parser-combinators-made-simple.html)
 * [In Clojure, but more advanced](https://gist.github.com/kachayev/b5887f66e2985a21a466)
-* Just look up Haskell's Parsec and its derivatives (Attoparsec, MegaParsec), where this all comes from
+* Haskell's Parsec and its derivatives (Attoparsec, MegaParsec), where this all comes from
 
 ## License
 
