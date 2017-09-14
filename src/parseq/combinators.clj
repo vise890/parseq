@@ -5,18 +5,23 @@
             [parseq.utils :as pu]))
 
 (defn return
-  "A parser that does nothing and always succeeds.
-   It returns the input unchanged and the supplied `v` as a result."
+  "A parser that does nothing and always succeeds. It returns the input
+  unchanged and the supplied `v` as a result."
   [v]
   (fn [input] [v input]))
 
 (defn bind
-  "This is just a monadic bind. A.k.a. >>=
+  "This is a monadic bind. A.k.a. >>=
 
-   bind :: [Parser a, (a -> Parser b)] -> Parser b
+  Its type is:
 
-  Kind of 'Apply parser `p` and then apply the parser `p2`
-  you get by applying `f` to the result of `p`'"
+  bind :: [Parser a, (a -> Parser b)] -> Parser b
+
+  It roughly means:
+  1. Apply parser `p`, if that fails, the whole thing fails
+  2. If it didn't fail, you got a result, say `r`
+  3. Apply `f` to `r` to get another parser, say (`p2`) (look at the type above)
+  4. Apply `p2` and return **its** result"
   [p f]
   (fn [input]
     (match (pu/parse p input)
@@ -25,6 +30,8 @@
 
 (defn fmap
   "Applies function `f` to the result of `p`
+
+  Its type is:
 
   fmap :: [Parser a, (a -> b)] -> Parser b"
   [f p]
@@ -46,8 +53,8 @@
                (f :guard pu/failure?) (recur ps (conj failures f) res))))))
 
 (defn ?
-  "Optionally parses one `p`, returning a seq containing it if found.
-  If `p` doesn't match, returns an empty seq"
+  "Optionally parses one `p`, returning a seq containing it if found. If `p`
+  doesn't match, returns an empty seq"
   [p]
   (fn [input]
     (match (pu/parse p input)
@@ -56,8 +63,6 @@
 
 (defn *
   "Parse `p` 0 or more times. Similar to `*` in regular expressions."
-  ;; NOTE cleverer impl to feel good about myself?
-  ;;      worth leaving for perf? FIXME:
   [p]
   (fn [input]
     (loop [results    []
@@ -80,7 +85,8 @@
                 (* p)))))
 
 (defn merge
-  "Applies `parsers` in order and then merges their results into one big fat map."
+  "Applies `parsers` in order and then merges their results into one big fat
+  map."
   [parsers]
   (fn [input]
     (loop [[p & ps :as pps] parsers
