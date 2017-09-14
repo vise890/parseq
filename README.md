@@ -1,6 +1,8 @@
 # parseq
 
-A small library of parser combinators that operate on clojure `seq`s
+A small library of [parser
+combinators](https://en.wikipedia.org/wiki/Parser_combinator) that operate on
+clojure `seq`s rather than strings.
 
 ## Intro
 
@@ -67,11 +69,11 @@ Combinator :: Parser a -> Parser b
 (pu/parse (c/peek p/one) [1 [2 3]])
 ;; => [1 [1 [2 3]]]
 
-(pu/parse (c/* (p/one= 1)) [1 1 1 :a :a :a])
+(pu/parse (c/many* (p/one= 1)) [1 1 1 :a :a :a])
 ;; => [[1 1 1] [:a :a :a]]
 
-(pu/parse (c/* (c/or (p/one= 1)
-                     (p/one= 2)))
+(pu/parse (c/many* (c/or (p/one= 1)
+                         (p/one= 2)))
           [1 1 1 2 2 2 :a :a :a])
 ;; => [[1 1 1 2 2 2] [:a :a :a]]
 
