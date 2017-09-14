@@ -1,4 +1,5 @@
-(ns parseq.utils)
+(ns parseq.utils
+  "Helpers for dealing with parsers and their results")
 
 (defn parse
   "A helper function to invoke parser p on input"

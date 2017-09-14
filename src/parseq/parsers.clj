@@ -1,4 +1,5 @@
 (ns parseq.parsers
+  "An eclectic bunch of parsers"
   (:require [clojure.core.match :refer [match]]
             [parseq.utils :as pu]))
 
@@ -10,7 +11,7 @@
 (def
   ^{:doc "A parser that always fails"}
   fail
-  (->fail "fail-p"))
+  (->fail "`fail` failed, it always does that..."))
 
 (defn one
   "A parser that takes (any) one element"

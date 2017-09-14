@@ -1,4 +1,5 @@
 (ns parseq.combinators
+  "Combinators for `parseq.parsers` and similar"
   (:refer-clojure :exclude [or merge peek + *])
   (:require [clojure.core.match :refer [match]]
             [parseq.utils :as pu]))
