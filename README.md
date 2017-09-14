@@ -45,9 +45,11 @@ Combinator :: Parser a -> Parser b
 
 ## Usage
 
+[![Clojars Project](https://img.shields.io/clojars/v/vise890/parseq.svg)](https://clojars.org/vise890/parseq)
+
 ```clojure
 ;;; project.clj
-[vise890/parseq "0.1.0"]
+[vise890/parseq "0.1.0-SNAPSHOT"]
 ```
 
 ```clojure
