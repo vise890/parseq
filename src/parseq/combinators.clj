@@ -1,10 +1,5 @@
 (ns parseq.combinators
-  "
-  Generic combinators for parsers
-
-
-  NOTE: in this ns, parsers are denoted with -p and combinators with -c suffixes
-  "
+  (:refer-clojure :exclude [or merge peek])
   (:require [clojure.core.match :refer [match]]
             [parseq.utils :as pu]))
 
@@ -14,9 +9,10 @@
   [v]
   (fn [input] [v input]))
 
-;; bind :: [Parser a, a -> Parser b] -> Parser b
 (defn bind
-  "This is just a monadic bind. A.k.a. >>="
+  "This is just a monadic bind. A.k.a. >>=
+
+   bind :: [Parser a, (a -> Parser b)] -> Parser b"
   [p f]
   (fn [input]
     (match (pu/parse p input)
@@ -24,11 +20,13 @@
            (r :guard pu/failure?) r)))
 
 (defn fmap
-  "Applies function `f` to the result of `p`"
+  "Applies function `f` to the result of `p`
+
+  fmap :: [Parser a, (a -> b)] -> Parser b"
   [f p]
   (bind p #(return (f %))))
 
-(defn or-c
+(defn or
   "Tries `parsers` in sequence and returns the first one that succeeds. If they
   all fail, it fails."
   [& parsers]
@@ -45,7 +43,7 @@
                [r rsin] [r rsin]
                (f :guard pu/failure?) (recur ps (conj failures f) res))))))
 
-(defn many-c
+(defn many
   "Parse `p` 0 or more times"
   ;; NOTE you could make this as a combo of `and-c` + `optional-c`, but may be
   ;;      worth leaving for perf?
@@ -57,7 +55,7 @@
              [r rsin] (recur (conj results r) rsin)
              (_ :guard pu/failure?) [results rest-input]))))
 
-(defn merge-c
+(defn merge
   "Applies `parsers` in order and then merges
   their results into one big fat map."
   [parsers]
@@ -70,10 +68,10 @@
         (match (pu/parse p rest-input)
                [r rsin] (recur ps
                                rsin
-                               (merge results r))
+                               (clojure.core/merge results r))
                (f :guard pu/failure?) f)))))
 
-(defn peek-c
+(defn peek
   "Peeks with p (and fails if p fails). Does not consume any input"
   [p]
   (fn [input]

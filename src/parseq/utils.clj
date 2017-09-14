@@ -37,9 +37,3 @@
   ([msg data] (merge data
                      {:failure-msg msg})))
 
-(defn ->fail-p
-  "Builds a parser that always fails"
-  ([msg] (fn [input] (->failure msg)))
-  ([msg data] (fn [input] (->failure msg data))))
-
-
