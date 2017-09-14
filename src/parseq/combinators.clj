@@ -1,6 +1,6 @@
 (ns parseq.combinators
   "Combinators for `parseq.parsers` and similar"
-  (:refer-clojure :exclude [or merge peek + *])
+  (:refer-clojure :exclude [or merge peek])
   (:require [clojure.core.match :refer [match]]
             [parseq.utils :as pu]))
 
@@ -52,7 +52,7 @@
                [r rsin] [r rsin]
                (f :guard pu/failure?) (recur ps (conj failures f) res))))))
 
-(defn ?
+(defn one?
   "Optionally parses one `p`, returning a seq containing it if found. If `p`
   doesn't match, returns an empty seq"
   [p]
@@ -60,8 +60,9 @@
     (match (pu/parse p input)
            [r rsin] [[r] rsin]
            (f :guard pu/failure?) [[] input])))
+(def optional one?)
 
-(defn *
+(defn many*
   "Parse `p` 0 or more times. Similar to `*` in regular expressions."
   [p]
   (fn [input]
@@ -71,18 +72,18 @@
              [r rsin] (recur (conj results r) rsin)
              (_ :guard pu/failure?) [results rest-input]))))
 
-(defn vanity*
-  "Alternative, way cooler implementation of *"
+(defn vanity-many*
+  "Alternative, way cooler implementation of many*"
   [p]
-  (bind (? p)
+  (bind (one? p)
         (fn [r] (fmap (partial concat r) (* p)))))
 
-(defn +
+(defn many+
   [p]
   (bind p
         (fn [r]
           (fmap #(conj % r)
-                (* p)))))
+                (many* p)))))
 
 (defn merge
   "Applies `parsers` in order and then merges their results into one big fat

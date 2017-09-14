@@ -24,8 +24,8 @@
 (deftest or-c
 
   (is (= [[1 1 2] [:a :a]]
-         (pu/parse (sut/* (sut/or (p/one= 1)
-                                  (p/one= 2)))
+         (pu/parse (sut/many* (sut/or (p/one= 1)
+                                      (p/one= 2)))
                    [1 1 2 :a :a])))
 
   (is (= [:hi nil]
@@ -51,61 +51,61 @@
 (deftest ?-c
 
   (is (= [[:a] [:b :c]]
-         (pu/parse (sut/? p/one)
+         (pu/parse (sut/one? p/one)
                    [:a :b :c])))
 
   (is (= [[] [:a :b :c]]
-         (pu/parse (sut/? (p/one= :boop))
+         (pu/parse (sut/one? (p/one= :boop))
                    [:a :b :c]))))
 
 (deftest *-c
   (is (= [[:a :b :c :d] nil]
-         (pu/parse (sut/* p/one) [:a :b :c :d])))
+         (pu/parse (sut/many* p/one) [:a :b :c :d])))
 
   (testing "stops parsing correctly"
     (is (= [[1 1 1] [:a :a :a]]
-           (pu/parse (sut/* (p/one= 1)) [1 1 1 :a :a :a]))))
+           (pu/parse (sut/many* (p/one= 1)) [1 1 1 :a :a :a]))))
 
   (testing "returns [] when input is nil"
     (is (= [[] []]
-           (pu/parse (sut/* p/one) [])))
+           (pu/parse (sut/many* p/one) [])))
     (is (= [[] nil]
-           (pu/parse (sut/* p/one) nil)))))
+           (pu/parse (sut/many* p/one) nil)))))
 
 (deftest vanity*
   (is (= [[:a :b :c :d] nil]
-         (pu/parse (sut/vanity* p/one) [:a :b :c :d])))
+         (pu/parse (sut/vanity-many* p/one) [:a :b :c :d])))
 
   (testing "stops parsing correctly"
     (is (= [[1 1 1] [:a :a :a]]
-           (pu/parse (sut/vanity* (p/one= 1)) [1 1 1 :a :a :a]))))
+           (pu/parse (sut/vanity-many* (p/one= 1)) [1 1 1 :a :a :a]))))
 
   (testing "returns [] when input is nil"
     (is (= [[] []]
-           (pu/parse (sut/vanity* p/one) [])))
+           (pu/parse (sut/vanity-many* p/one) [])))
     (is (= [[] nil]
-           (pu/parse (sut/vanity* p/one) nil)))))
+           (pu/parse (sut/vanity-many* p/one) nil)))))
 
 (deftest +-c
   (is (= [[:a :a] [:b :c]]
-         (pu/parse (sut/+ (p/one= :a))
+         (pu/parse (sut/many+ (p/one= :a))
                    [:a :a :b :c])))
 
-  (is (pu/failure? (pu/parse (sut/+ (p/one= :a))
+  (is (pu/failure? (pu/parse (sut/many+ (p/one= :a))
                              [:f :o :o])))
 
   (testing "maintains order"
     (is (= [[1 2 3] [:a]]
-           (pu/parse (sut/* (sut/or (p/one= 2)
-                                    (p/one= 1)
-                                    (p/one= 3)))
+           (pu/parse (sut/many* (sut/or (p/one= 2)
+                                        (p/one= 1)
+                                        (p/one= 3)))
                      [1 2 3 :a]))))
 
   (testing "returns [] when input is nil"
     (is (= [[] []]
-           (pu/parse (sut/* p/one) [])))
+           (pu/parse (sut/many* p/one) [])))
     (is (= [[] nil]
-           (pu/parse (sut/* p/one) nil)))))
+           (pu/parse (sut/many* p/one) nil)))))
 
 (deftest merge-c
   (let [p   (sut/merge [(sut/fmap (fn [one] {:one one})
