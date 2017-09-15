@@ -60,7 +60,7 @@
     (match (pu/parse p input)
            [r rsin] [[r] rsin]
            (f :guard pu/failure?) [[] input])))
-(def optional one?)
+(def ^{:doc "Alias to `one?`"} optional one?)
 
 (defn many*
   "Parse `p` 0 or more times. Similar to `*` in regular expressions."
@@ -81,6 +81,7 @@
                 (many* p)))))
 
 (defn many+
+  "Parse `p` 1 or more times. Similar to `+` in regular expressions."
   [p]
   (bind p
         (fn [r]
@@ -120,4 +121,3 @@
   "Skips 1 or more p."
   [p]
   (fmap (fn [_] nil) (many+ p)))
-

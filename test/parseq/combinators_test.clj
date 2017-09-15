@@ -5,7 +5,6 @@
             [parseq.utils :as pu]))
 
 (deftest bind
-
   (is (= [2 [3]]
          (pu/parse (sut/bind p/one
                              (fn [_2] p/one))
@@ -22,7 +21,6 @@
                    [1 :fin]))))
 
 (deftest or-c
-
   (is (= [[1 1 2] [:a :a]]
          (pu/parse (sut/many* (sut/or (p/one= 1)
                                       (p/one= 2)))
@@ -49,7 +47,6 @@
         (is (= 2 (count pfs)))))))
 
 (deftest optional-c
-
   (is (= [[:a] [:b :c]]
          (pu/parse (sut/one? p/one)
                    [:a :b :c])))
@@ -134,7 +131,6 @@
            (pu/parse (sut/merge []) [[1 2]])))))
 
 (deftest peek-c
-
   (testing "consumes no input"
     (is (= [1 [1 [2 3]]]
            (pu/parse (sut/peek p/one) [1 [2 3]]))))
