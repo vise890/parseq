@@ -76,7 +76,9 @@
   "Alternative, way cooler implementation of many*"
   [p]
   (bind (one? p)
-        (fn [r] (fmap (partial concat r) (* p)))))
+        (fn [r]
+          (fmap (partial concat r)
+                (many* p)))))
 
 (defn many+
   [p]
@@ -112,11 +114,11 @@
 (defn skip*
   "Skips 0 or more p."
   [p]
-  (fmap (fn [_] nil) (* p)))
+  (fmap (fn [_] nil) (many* p)))
 
 (defn skip+
   "Skips 1 or more p."
   [p]
-  (fmap (fn [_] nil) (+ p)))
+  (fmap (fn [_] nil) (many+ p)))
 
 

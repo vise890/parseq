@@ -48,17 +48,18 @@
         (is (every? pu/failure? pfs))
         (is (= 2 (count pfs)))))))
 
-(deftest ?-c
+(deftest optional-c
 
   (is (= [[:a] [:b :c]]
          (pu/parse (sut/one? p/one)
                    [:a :b :c])))
 
   (is (= [[] [:a :b :c]]
-         (pu/parse (sut/one? (p/one= :boop))
+         ;; NOTE `one?` is a.k.a. `optional`
+         (pu/parse (sut/optional (p/one= :boop))
                    [:a :b :c]))))
 
-(deftest *-c
+(deftest many*-c
   (is (= [[:a :b :c :d] nil]
          (pu/parse (sut/many* p/one) [:a :b :c :d])))
 
@@ -86,7 +87,7 @@
     (is (= [[] nil]
            (pu/parse (sut/vanity-many* p/one) nil)))))
 
-(deftest +-c
+(deftest many+-c
   (is (= [[:a :a] [:b :c]]
          (pu/parse (sut/many+ (p/one= :a))
                    [:a :a :b :c])))
