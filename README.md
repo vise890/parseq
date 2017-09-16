@@ -4,8 +4,8 @@ A small library of [parser
 combinators](https://en.wikipedia.org/wiki/Parser_combinator) that operate on
 clojure `seq`s rather than strings.
 
-**NOTE**: it doesn't actually (yet) work on `seq`s but sequential collections
-i definitely need to do more reading / thinking
+**NOTE**: it doesn't actually (yet) work on `seq`s but rather on sequential
+collections
 
 ## Intro
 
