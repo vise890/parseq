@@ -2,7 +2,7 @@
 
 A small library of [parser
 combinators](https://en.wikipedia.org/wiki/Parser_combinator) that operate on
-clojure `seq`s rather than strings.
+Clojure sequential collections rather than strings.
 
 **NOTE**: it doesn't actually (yet) work on `seq`s but rather on sequential
 collections

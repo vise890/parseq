@@ -15,13 +15,7 @@
 
   Its type is:
 
-  bind :: [Parser a, (a -> Parser b)] -> Parser b
-
-  It roughly means:
-  1. Apply parser `p`, if that fails, the whole thing fails
-  2. If it didn't fail, you got a result, say `r`
-  3. Apply `f` to `r` to get another parser, say (`p2`) (look at the type above)
-  4. Apply `p2` and return **its** result"
+  bind :: [Parser a, (a -> Parser b)] -> Parser b"
   [p f]
   (fn [input]
     (match (pu/parse p input)

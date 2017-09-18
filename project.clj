@@ -1,5 +1,5 @@
 (defproject vise890/parseq "0.2.1"
-  :description "Parser combinators for clojure seqs"
+  :description "Parser combinators for clojure data"
 
   :url "http://github.com/vise890/parseq"
 
