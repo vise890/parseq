@@ -1,4 +1,4 @@
-(defproject vise890/parseq "0.2.1"
+(defproject vise890/parseq "0.2.2-SNAPSHOT"
   :description "Parser combinators for clojure data"
 
   :url "http://github.com/vise890/parseq"
