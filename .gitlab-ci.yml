@@ -3,5 +3,12 @@ image: clojure:lein-2.7.0
 test:
   stage: test
   script:
-  - lein test
+    - lein test
+
+deploy:
+  stage: deploy
+  only:
+    - master
+  script:
+    - lein with-profile ci deploy clojars
 

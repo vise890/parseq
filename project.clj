@@ -7,4 +7,10 @@
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/core.match "0.3.0-alpha5"]])
+                 [org.clojure/core.match "0.3.0-alpha5"]]
+
+  :profiles {:ci {:deploy-repositories
+                  [["clojars" {:url           "https://clojars.org/repo"
+                               :username      :env
+                               :password      :env
+                               :sign-releases false}]]}})
