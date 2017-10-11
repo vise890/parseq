@@ -20,9 +20,6 @@
   all the input."
   [parse-result]
   (and (success? parse-result)
-       ;; god i miss types..
-       (vector? parse-result)
-       (= 2 (count parse-result))
        (nil? (second parse-result))))
 (def ^{:doc "Alias to `all-input-parsed?`"}
   complete-success? all-input-parsed?)
