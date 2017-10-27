@@ -37,14 +37,14 @@
   [& parsers]
   (fn [input]
     (loop [[p & ps :as parsers] parsers
-           failures             []
+           failures             (transient [])
            res                  nil]
       (if (empty? parsers)
         (pu/->failure "or-c had no more parsers"
-                      {:parsers-failures failures})
+                      {:parsers-failures (persistent! failures)})
         (match (pu/parse p input)
                [r rsin] [r rsin]
-               (f :guard pu/failure?) (recur ps (conj failures f) res))))))
+               (f :guard pu/failure?) (recur ps (conj! failures f) res))))))
 
 (defn one?
   "Optionally parses one `p`, returning a seq containing it if found. If `p`
@@ -60,19 +60,11 @@
   "Parse `p` 0 or more times. Similar to `*` in regular expressions."
   [p]
   (fn [input]
-    (loop [results    []
+    (loop [results    (transient [])
            rest-input input]
       (match (pu/parse p rest-input)
-             [r rsin] (recur (conj results r) rsin)
-             (_ :guard pu/failure?) [results rest-input]))))
-
-(defn vanity-many*
-  "Alternative, way cooler implementation of many*"
-  [p]
-  (bind (one? p)
-        (fn [r]
-          (fmap (partial concat r)
-                (many* p)))))
+             [r rsin] (recur (conj! results r) rsin)
+             (_ :guard pu/failure?) [(persistent! results) rest-input]))))
 
 (defn many+
   "Parse `p` 1 or more times. Similar to `+` in regular expressions."
@@ -89,13 +81,13 @@
   (fn [input]
     (loop [[p & ps :as pps] parsers
            rest-input       input
-           results          {}]
+           results          (transient {})]
       (if (empty? pps)
-        [results rest-input]
+        [(persistent! results) rest-input]
         (match (pu/parse p rest-input)
                [r rsin] (recur ps
                                rsin
-                               (clojure.core/merge results r))
+                               (conj! results r))
                (f :guard pu/failure?) f)))))
 
 (defn peek

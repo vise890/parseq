@@ -70,20 +70,6 @@
     (is (= [[] nil]
            (pu/parse (sut/many* p/one) nil)))))
 
-(deftest vanity*
-  (is (= [[:a :b :c :d] nil]
-         (pu/parse (sut/vanity-many* p/one) [:a :b :c :d])))
-
-  (testing "stops parsing correctly"
-    (is (= [[1 1 1] [:a :a :a]]
-           (pu/parse (sut/vanity-many* (p/one= 1)) [1 1 1 :a :a :a]))))
-
-  (testing "returns [] when input is nil"
-    (is (= [[] []]
-           (pu/parse (sut/vanity-many* p/one) [])))
-    (is (= [[] nil]
-           (pu/parse (sut/vanity-many* p/one) nil)))))
-
 (deftest many+-c
   (is (= [[:a :a] [:b :c]]
          (pu/parse (sut/many+ (p/one= :a))
