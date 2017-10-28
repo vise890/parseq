@@ -37,14 +37,14 @@
   [& parsers]
   (fn [input]
     (loop [[p & ps :as parsers] parsers
-           failures             (transient [])
+           failures             []
            res                  nil]
       (if (empty? parsers)
         (pu/->failure "or-c had no more parsers"
-                      {:parsers-failures (persistent! failures)})
+                      {:parsers-failures failures})
         (match (pu/parse p input)
                [r rsin] [r rsin]
-               (f :guard pu/failure?) (recur ps (conj! failures f) res))))))
+               (f :guard pu/failure?) (recur ps (conj failures f) res))))))
 
 (defn one?
   "Optionally parses one `p`, returning a seq containing it if found. If `p`
@@ -60,11 +60,11 @@
   "Parse `p` 0 or more times. Similar to `*` in regular expressions."
   [p]
   (fn [input]
-    (loop [results    (transient [])
+    (loop [results    []
            rest-input input]
       (match (pu/parse p rest-input)
-             [r rsin] (recur (conj! results r) rsin)
-             (_ :guard pu/failure?) [(persistent! results) rest-input]))))
+             [r rsin] (recur (conj results r) rsin)
+             (_ :guard pu/failure?) [results rest-input]))))
 
 (defn many+
   "Parse `p` 1 or more times. Similar to `+` in regular expressions."
@@ -81,13 +81,13 @@
   (fn [input]
     (loop [[p & ps :as pps] parsers
            rest-input       input
-           results          (transient {})]
+           results          {}]
       (if (empty? pps)
-        [(persistent! results) rest-input]
+        [results rest-input]
         (match (pu/parse p rest-input)
                [r rsin] (recur ps
                                rsin
-                               (conj! results r))
+                               (conj results r))
                (f :guard pu/failure?) f)))))
 
 (defn peek
