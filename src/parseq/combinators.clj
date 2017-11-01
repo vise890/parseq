@@ -36,15 +36,15 @@
   all fail, it fails."
   [& parsers]
   (fn [input]
-    (loop [[p & ps :as parsers] parsers
-           failures             []
-           res                  nil]
-      (if (empty? parsers)
-        (pu/->failure "or-c had no more parsers"
-                      {:parsers-failures failures})
+    (loop [parsers  parsers
+           failures []
+           res      nil]
+      (if-let [[p & ps] (seq parsers)]
         (match (pu/parse p input)
                [r rsin] [r rsin]
-               (f :guard pu/failure?) (recur ps (conj failures f) res))))))
+               (f :guard pu/failure?) (recur ps (conj failures f) res))
+        (pu/->failure "or-c had no more parsers"
+                      {:parsers-failures failures})))))
 
 (defn one?
   "Optionally parses one `p`, returning a seq containing it if found. If `p`
@@ -79,16 +79,14 @@
   map."
   [parsers]
   (fn [input]
-    (loop [[p & ps :as pps] parsers
-           rest-input       input
-           results          {}]
-      (if (empty? pps)
-        [results rest-input]
+    (loop [parsers    parsers
+           rest-input input
+           results    {}]
+      (if-let [[p & ps] (seq parsers)]
         (match (pu/parse p rest-input)
-               [r rsin] (recur ps
-                               rsin
-                               (conj results r))
-               (f :guard pu/failure?) f)))))
+               [r rsin] (recur ps rsin (conj results r))
+               (f :guard pu/failure?) f)
+        [results rest-input]))))
 
 (defn peek
   "Peeks with p (and fails if p fails). Does not consume any input"
