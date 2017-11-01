@@ -1,7 +1,7 @@
 (defproject vise890/parseq "0.2.4"
   :description "Parser combinators for clojure data"
 
-  :url "http://github.com/vise890/parseq"
+  :url "http://gitlab.com/vise890/parseq"
 
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
