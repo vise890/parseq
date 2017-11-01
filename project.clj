@@ -9,8 +9,9 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/core.match "0.3.0-alpha5"]]
 
-  :profiles {:ci {:deploy-repositories
-                  [["clojars" {:url           "https://clojars.org/repo"
-                               :username      :env
-                               :password      :env
-                               :sign-releases false}]]}})
+  :profiles {:dev {:dependencies [[criterium "0.4.4"]]}
+             :ci  {:deploy-repositories
+                   [["clojars" {:url           "https://clojars.org/repo"
+                                :username      :env
+                                :password      :env
+                                :sign-releases false}]]}})
