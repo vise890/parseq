@@ -20,7 +20,7 @@
                              (p/one= 1))
                    [1 :fin]))))
 
-(deftest or-c
+(deftest or
   (is (= [[1 1 2] [:a :a]]
          (pu/parse (sut/many* (sut/or (p/one= 1)
                                       (p/one= 2)))
@@ -46,7 +46,7 @@
         (is (every? pu/failure? pfs))
         (is (= 2 (count pfs)))))))
 
-(deftest optional-c
+(deftest one?
   (is (= [[:a] [:b :c]]
          (pu/parse (sut/one? p/one)
                    [:a :b :c])))
@@ -56,7 +56,7 @@
          (pu/parse (sut/optional (p/one= :boop))
                    [:a :b :c]))))
 
-(deftest many*-c
+(deftest many*
   (is (= [[:a :b :c :d] nil]
          (pu/parse (sut/many* p/one) [:a :b :c :d])))
 
@@ -70,7 +70,7 @@
     (is (= [[] nil]
            (pu/parse (sut/many* p/one) nil)))))
 
-(deftest many+-c
+(deftest many+
   (is (= [[:a :a] [:b :c]]
          (pu/parse (sut/many+ (p/one= :a))
                    [:a :a :b :c])))
@@ -91,7 +91,7 @@
     (is (= [[] nil]
            (pu/parse (sut/many* p/one) nil)))))
 
-(deftest merge-c
+(deftest merge
   (let [p   (sut/merge [(sut/fmap (fn [one] {:one one})
                                   (p/one= 1))
                         (sut/fmap (fn [two] {:two two})
@@ -116,7 +116,7 @@
     (is (= [{} [[1 2]]]
            (pu/parse (sut/merge []) [[1 2]])))))
 
-(deftest peek-c
+(deftest peek
   (testing "consumes no input"
     (is (= [1 [1 [2 3]]]
            (pu/parse (sut/peek p/one) [1 [2 3]]))))
@@ -125,7 +125,7 @@
     (is (pu/failure?
          (pu/parse (sut/peek p/one) [])))))
 
-(deftest skip*-c
+(deftest skip*
   (is (= [nil [:b]]
          (pu/parse (sut/skip* (p/one= :a)) [:a :a :b])))
 
@@ -133,7 +133,7 @@
     (is (= [nil [:a :b]]
            (pu/parse (sut/skip* (p/one= :b)) [:a :b])))))
 
-(deftest skip+-c
+(deftest skip+
   (is (= [nil [:b]]
          (pu/parse (sut/skip+ (p/one= :a)) [:a :a :b])))
 
