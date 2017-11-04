@@ -46,6 +46,15 @@
         (is (every? pu/failure? pfs))
         (is (= 2 (count pfs)))))))
 
+(deftest sut-and
+  (is (= [[1 2] [:a :a]]
+         (pu/parse (sut/and (p/one= 1) (p/one= 2))
+                   [1 2 :a :a])))
+  (testing "fails when not all parsers match"
+    (is (pu/failure? (pu/parse (sut/and (p/one= 1)
+                                        (p/one= 2))
+                               [1 3])))))
+
 (deftest one?
   (is (= [[:a] [:b :c]]
          (pu/parse (sut/one? p/one)

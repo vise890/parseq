@@ -1,6 +1,6 @@
 (ns parseq.combinators
   "Combinators for `parseq.parsers` and similar"
-  (:refer-clojure :exclude [or merge peek])
+  (:refer-clojure :exclude [or and merge peek])
   (:require [clojure.core.match :refer [match]]
             [parseq.utils :as pu]))
 
@@ -37,14 +37,25 @@
   [& parsers]
   (fn [input]
     (loop [parsers  parsers
-           failures []
-           res      nil]
+           failures []]
       (if-let [[p & ps] (seq parsers)]
         (match (pu/parse p input)
                [r rsin] [r rsin]
-               (f :guard pu/failure?) (recur ps (conj failures f) res))
+               (f :guard pu/failure?) (recur ps (conj failures f)))
         (pu/->failure "or-c had no more parsers"
                       {:parsers-failures failures})))))
+
+(defn and
+  [& parsers]
+  (fn [input]
+    (loop [parsers parsers
+           res []
+           input input]
+      (if-let [[p & ps] (seq parsers)]
+        (match (pu/parse p input)
+               [r rsin] (recur ps (conj res r) rsin)
+               (f :guard pu/failure?) f)
+        [res input]))))
 
 (defn one?
   "Optionally parses one `p`, returning a seq containing it if found. If `p`
