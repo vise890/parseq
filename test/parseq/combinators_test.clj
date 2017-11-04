@@ -20,7 +20,7 @@
                              (p/one= 1))
                    [1 :fin]))))
 
-(deftest or
+(deftest sut-or
   (is (= [[1 1 2] [:a :a]]
          (pu/parse (sut/many* (sut/or (p/one= 1)
                                       (p/one= 2)))
@@ -100,7 +100,7 @@
     (is (= [[] nil]
            (pu/parse (sut/many* p/one) nil)))))
 
-(deftest merge
+(deftest sut-merge
   (let [p   (sut/merge [(sut/fmap (fn [one] {:one one})
                                   (p/one= 1))
                         (sut/fmap (fn [two] {:two two})
@@ -125,7 +125,7 @@
     (is (= [{} [[1 2]]]
            (pu/parse (sut/merge []) [[1 2]])))))
 
-(deftest peek
+(deftest sut-peek
   (testing "consumes no input"
     (is (= [1 [1 [2 3]]]
            (pu/parse (sut/peek p/one) [1 [2 3]]))))
