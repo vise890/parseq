@@ -149,3 +149,22 @@
   (testing "fails when parser doesn't match first repetition"
     (is (pu/failure? (pu/parse (sut/skip+ (p/one= :b))
                                [:a :b])))))
+
+(deftest unordered
+  (let [p (sut/many* (sut/or (p/one= :a)
+                             (p/one= :b)))]
+    (is (= [[:a :b :b :a :a :a :b :a] [:c]]
+           (pu/parse p [:a :b :b :a :a :a :b :a :c]))))
+
+  (testing "A more complex example"
+    (let [p (sut/fmap #(apply (partial merge-with concat) %)
+                      (sut/many+ (sut/or (sut/fmap (fn [one] {:one one})
+                                                   (sut/many+ (p/one= 1)))
+                                         (sut/fmap (fn [two] {:two two})
+                                                   (sut/many+ (p/one= 2)))
+                                         (sut/fmap (fn [three] {:three three})
+                                                   (sut/many+ (p/one= 3))))))]
+      (is (= [{:one   [1 1 1]
+               :two   [2 2]
+               :three [3 3]} [:nope]]
+             (pu/parse p [1 1 3 2 2 1 3 :nope]))))))
