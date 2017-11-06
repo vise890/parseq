@@ -38,7 +38,7 @@
   (fn [input]
     (loop [parsers  parsers
            failures []]
-      (if-let [[p & ps] (seq parsers)]
+      (if-let [[p & ps] (not-empty parsers)]
         (match (pu/parse p input)
                [r rsin] [r rsin]
                (f :guard pu/failure?) (recur ps (conj failures f)))
@@ -51,15 +51,15 @@
     (loop [parsers parsers
            res []
            input input]
-      (if-let [[p & ps] (seq parsers)]
+      (if-let [[p & ps] (not-empty parsers)]
         (match (pu/parse p input)
                [r rsin] (recur ps (conj res r) rsin)
                (f :guard pu/failure?) f)
         [res input]))))
 
 (defn one?
-  "Optionally parses one `p`, returning a seq containing it if found. If `p`
-  doesn't match, returns an empty seq"
+  "Optionally parses one `p`, returning a sequential coll containing it if found. If `p`
+  doesn't match, returns an empty coll."
   [p]
   (fn [input]
     (match (pu/parse p input)
@@ -93,7 +93,7 @@
     (loop [parsers    parsers
            rest-input input
            results    {}]
-      (if-let [[p & ps] (seq parsers)]
+      (if-let [[p & ps] (not-empty parsers)]
         (match (pu/parse p rest-input)
                [r rsin] (recur ps rsin (conj results r))
                (f :guard pu/failure?) f)
