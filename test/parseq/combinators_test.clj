@@ -88,17 +88,12 @@
                              [:f :o :o])))
 
   (testing "maintains order"
-    (is (= [[1 2 3] [:a]]
-           (pu/parse (sut/many* (sut/or (p/one= 2)
-                                        (p/one= 1)
-                                        (p/one= 3)))
-                     [1 2 3 :a]))))
-
-  (testing "returns [] when input is nil"
-    (is (= [[] []]
-           (pu/parse (sut/many* p/one) [])))
-    (is (= [[] nil]
-           (pu/parse (sut/many* p/one) nil)))))
+    (is (= [[1 2] [:a]]
+           (pu/parse (sut/many+ (p/one-satisfying integer?))
+                     [1 2 :a])))
+    (is (= [["a" "b"] [:c]]
+           (pu/parse (sut/many+ (p/one-satisfying string?))
+                     ["a" "b" :c])))))
 
 (deftest sut-merge
   (let [p   (sut/merge [(sut/fmap (fn [one] {:one one})

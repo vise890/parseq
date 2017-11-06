@@ -82,7 +82,7 @@
   [p]
   (bind p
         (fn [r]
-          (fmap #(conj % r)
+          (fmap #(cons r %) ;; FIXME this is not ideal, rewrite as a loop
                 (many* p)))))
 
 (defn merge
