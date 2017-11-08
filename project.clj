@@ -9,6 +9,8 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/core.match "0.3.0-alpha5"]]
 
+  :plugins [[lein-codox "0.10.3"]]
+
   :profiles {:dev {:dependencies [[criterium "0.4.4"]]}
              :ci  {:deploy-repositories
                    [["clojars" {:url           "https://clojars.org/repo"

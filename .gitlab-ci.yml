@@ -12,3 +12,13 @@ deploy:
   script:
     - lein with-profile ci deploy clojars
 
+pages:
+  stage: deploy
+  only:
+    - master
+  script:
+    - lein codox
+    - mv ./target/doc ./public
+  artifacts:
+    - public
+
