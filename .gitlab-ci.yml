@@ -20,5 +20,6 @@ pages:
     - lein codox
     - mv ./target/doc ./public
   artifacts:
-    - public
+    paths:
+      - public
 
