@@ -17,7 +17,7 @@ pages:
   only:
     - master
   script:
-    - lein codox
+    - lein do clean, codox
     - mv ./target/doc ./public
   artifacts:
     paths:
