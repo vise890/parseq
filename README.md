@@ -4,6 +4,8 @@ A small library of [parser
 combinators](https://en.wikipedia.org/wiki/Parser_combinator) that operate on
 Clojure sequential collections rather than strings.
 
+## [API Docs](https://vise890.gitlab.io/parseq/)
+
 ## Usage
 
 [![Clojars
