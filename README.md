@@ -21,7 +21,6 @@ Project](https://img.shields.io/clojars/v/vise890/parseq.svg)](https://clojars.o
 (require '[parseq.combinators :as pc])
 (require '[parseq.parsers :as pp])
 
-
 (pu/parse pp/one [1 2])
 ;; => [1 [2]]
 

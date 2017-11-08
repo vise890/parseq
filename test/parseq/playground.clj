@@ -4,7 +4,6 @@
 (require '[parseq.combinators :as pc])
 (require '[parseq.parsers :as pp])
 
-
 (pu/parse pp/one [1 2])
 ;; => [1 [2]]
 
@@ -71,13 +70,3 @@
 ;; => true
 (pu/parse pp/fail [:beep])
 ;; => {:failure-msg "`fail` failed, it always does that..."}
-
-
-
-
-
-
-
-
-
-
