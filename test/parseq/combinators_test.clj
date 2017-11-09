@@ -4,34 +4,14 @@
             [parseq.parsers :as p]
             [parseq.utils :as pu]))
 
-(deftest bind
-  (is (= [2 [3]]
-         (pu/parse (sut/bind p/one
-                             (fn [_2] p/one))
-                   [1 2 3])))
-
-  (is (pu/failure? (pu/parse (sut/bind p/fail
-                                       (fn [_] p/one))
-                             [[]]))))
-
-(deftest fmap
-  (is (= [{:one 1} [:fin]]
-         (pu/parse (sut/fmap (fn [one] {:one one})
-                             (p/one= 1))
-                   [1 :fin]))))
-
 (deftest sut-or
-  (is (= [[1 1 2] [:a :a]]
-         (pu/parse (sut/many* (sut/or (p/one= 1)
-                                      (p/one= 2)))
-                   [1 1 2 :a :a])))
+  (testing "lets you specify alternatives"
+    (is (= [:hi [:hola]]
+           (pu/parse (sut/or p/fail p/one) [:hi :hola]))))
 
-  (is (= [:hi nil]
-         (pu/parse (sut/or p/fail
-                           p/fail
-                           p/fail
-                           p/one)
-                   [:hi])))
+  (testing "works at the end of input"
+    (is (= [:hi nil]
+           (pu/parse (sut/or p/fail p/one) [:hi]))))
 
   (testing "fails when no parser matches"
     (is (pu/failure? (pu/parse (sut/or p/fail)
@@ -47,27 +27,40 @@
         (is (= 2 (count pfs)))))))
 
 (deftest sut-and
-  (is (= [[1 2] [:a :a]]
-         (pu/parse (sut/and (p/one= 1) (p/one= 2))
-                   [1 2 :a :a])))
+  (testing "specifies parsers to be applied in succession"
+    (is (= [[1 2] [:a :a]]
+           (pu/parse (sut/and (p/one= 1) (p/one= 2))
+                     [1 2 :a :a]))))
+
   (testing "fails when not all parsers match"
     (is (pu/failure? (pu/parse (sut/and (p/one= 1)
                                         (p/one= 2))
                                [1 3])))))
 
 (deftest one?
-  (is (= [[:a] [:b :c]]
-         (pu/parse (sut/one? p/one)
-                   [:a :b :c])))
+  (testing "applies the parser"
+    (is (= [[:a] [:b :c]]
+           (pu/parse (sut/one? p/one)
+                     [:a :b :c]))))
 
-  (is (= [[] [:a :b :c]]
-         ;; NOTE `one?` is a.k.a. `optional`
-         (pu/parse (sut/optional (p/one= :boop))
-                   [:a :b :c]))))
+  (testing "does not fail if the parser fails"
+    (is (= [[] [:a :b :c]]
+           ;; NOTE `one?` is a.k.a. `optional`
+           (pu/parse (sut/optional p/fail)
+                     [:a :b :c])))))
 
 (deftest many*
-  (is (= [[:a :b :c :d] nil]
-         (pu/parse (sut/many* p/one) [:a :b :c :d])))
+  (testing "takes 0 or more repetitions"
+    (is (= [[:a :b :c] nil]
+           (pu/parse (sut/many* p/one) [:a :b :c])))
+    (is (= [[] [:a :b :c]]
+           (pu/parse (sut/many* p/fail) [:a :b :c]))))
+
+  (testing "can be combined with sut/or"
+    (is (= [[:a :b :a] [:c :c]]
+           (pu/parse (sut/many* (sut/or (p/one= :a)
+                                        (p/one= :b)))
+                     [:a :b :a :c :c]))))
 
   (testing "stops parsing correctly"
     (is (= [[1 1 1] [:a :a :a]]
@@ -80,12 +73,14 @@
            (pu/parse (sut/many* p/one) nil)))))
 
 (deftest many+
-  (is (= [[:a :a] [:b :c]]
-         (pu/parse (sut/many+ (p/one= :a))
-                   [:a :a :b :c])))
+  (testing "takes multiple elements"
+    (is (= [[:a :a] [:b :c]]
+           (pu/parse (sut/many+ (p/one= :a))
+                     [:a :a :b :c]))))
 
-  (is (pu/failure? (pu/parse (sut/many+ (p/one= :a))
-                             [:f :o :o])))
+  (testing "requires at least one match"
+    (is (pu/failure? (pu/parse (sut/many+ (p/one= :a))
+                               [:f :o :o]))))
 
   (testing "maintains order"
     (is (= [[1 2] [:a]]
@@ -94,6 +89,24 @@
     (is (= [["a" "b"] [:c]]
            (pu/parse (sut/many+ (p/one-satisfying string?))
                      ["a" "b" :c])))))
+
+(deftest skip*
+  (testing "returns nil"
+    (is (= [nil [:b]]
+           (pu/parse (sut/skip* (p/one= :a)) [:a :a :b]))))
+
+  (testing "parses 0 repetitions"
+    (is (= [nil [:a :b]]
+           (pu/parse (sut/skip* (p/one= :b)) [:a :b])))))
+
+(deftest skip+
+  (testing "returns nil"
+    (is (= [nil [:b]]
+           (pu/parse (sut/skip+ (p/one= :a)) [:a :a :b]))))
+
+  (testing "requires at least one match"
+    (is (pu/failure? (pu/parse (sut/skip+ (p/one= :b))
+                               [:a :b])))))
 
 (deftest sut-merge
   (let [p   (sut/merge [(sut/fmap (fn [one] {:one one})
@@ -129,27 +142,25 @@
     (is (pu/failure?
          (pu/parse (sut/peek p/one) [])))))
 
-(deftest skip*
-  (is (= [nil [:b]]
-         (pu/parse (sut/skip* (p/one= :a)) [:a :a :b])))
+(deftest bind
+  (is (= [2 [3]]
+         (pu/parse (sut/bind p/one
+                             (fn [_2] p/one))
+                   [1 2 3])))
 
-  (testing "parses 0 repetitions"
-    (is (= [nil [:a :b]]
-           (pu/parse (sut/skip* (p/one= :b)) [:a :b])))))
+  (is (pu/failure? (pu/parse (sut/bind p/fail
+                                       (fn [_] p/one))
+                             [[]]))))
 
-(deftest skip+
-  (is (= [nil [:b]]
-         (pu/parse (sut/skip+ (p/one= :a)) [:a :a :b])))
-
-  (testing "fails when parser doesn't match first repetition"
-    (is (pu/failure? (pu/parse (sut/skip+ (p/one= :b))
-                               [:a :b])))))
+(deftest fmap
+  (is (= ["1" [:fin]]
+         (pu/parse (sut/fmap str p/one) [1 :fin]))))
 
 (deftest unordered
   (let [p (sut/many* (sut/or (p/one= :a)
                              (p/one= :b)))]
-    (is (= [[:a :b :b :a :a :a :b :a] [:c]]
-           (pu/parse p [:a :b :b :a :a :a :b :a :c]))))
+    (is (= [[:a :b :a] [:c]]
+           (pu/parse p [:a :b :a :c]))))
 
   (testing "A more complex example"
     (let [p (sut/fmap #(apply (partial merge-with concat) %)
